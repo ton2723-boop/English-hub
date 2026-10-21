@@ -747,3 +747,84 @@ a.card:hover {
 .delta.down {
   color: var(--bad);
 }
+
+/* ───── Flashcards ───── */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 12px 0;
+}
+
+.chip {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.chip.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+
+.deck-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.flashcard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 240px;
+  margin: 16px 0 0;
+  padding: 24px;
+  font: inherit;
+  color: inherit;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  text-align: center;
+}
+
+.flashcard.flipped {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+.fc-word {
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  font-weight: 800;
+}
+
+.fc-th {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.fc-example {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.center-actions {
+  justify-content: center;
+}
+
+details.card summary {
+  cursor: pointer;
+}

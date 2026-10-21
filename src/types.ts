@@ -57,6 +57,8 @@ export interface TestResult {
   questionIds?: string[]
 }
 
+export type UnitTheme = 'work' | 'travel' | 'life'
+
 export interface VocabItem {
   word: string
   th: string
@@ -66,8 +68,8 @@ export interface VocabItem {
 export interface Unit {
   id: string
   level: CefrLevel
-  /** 'work' marks workplace-English units. */
-  theme?: 'work'
+  /** Topic badge; core grammar units have none. */
+  theme?: UnitTheme
   title: Bilingual
   canDo: Bilingual[]
   vocab: VocabItem[]

@@ -10,6 +10,7 @@ export function Layout() {
     { to: '/test/pre', label: t('navTest') },
     { to: '/courses', label: t('navCourses') },
     { to: '/exams', label: t('navExams') },
+    { to: '/vocab', label: t('navVocab') },
     { to: '/progress', label: t('navProgress') },
   ]
   return (

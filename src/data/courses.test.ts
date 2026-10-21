@@ -5,11 +5,23 @@ import { UNITS, unitsForLevel } from './courses'
 import { EXAM_SECTIONS } from './exams'
 
 describe('course data', () => {
-  it('has 5 units per level, 3 of them workplace units', () => {
+  it('has 7 units per level: 2 core, 3 workplace, 1 travel, 1 everyday life', () => {
     for (const level of CEFR_LEVELS) {
       const units = unitsForLevel(level)
-      expect(units).toHaveLength(5)
+      expect(units).toHaveLength(7)
+      expect(units.filter((u) => !u.theme)).toHaveLength(2)
       expect(units.filter((u) => u.theme === 'work')).toHaveLength(3)
+      expect(units.filter((u) => u.theme === 'travel')).toHaveLength(1)
+      expect(units.filter((u) => u.theme === 'life')).toHaveLength(1)
+    }
+  })
+
+  it('gives every unit a reading and 8 practice questions with reading and listening', () => {
+    for (const u of UNITS) {
+      expect(u.reading, u.id).toBeTruthy()
+      expect(u.practice, u.id).toHaveLength(8)
+      expect(u.practice.some((q) => q.skill === 'reading'), u.id).toBe(true)
+      expect(u.practice.some((q) => q.skill === 'listening' && q.audio), u.id).toBe(true)
     }
   })
 
@@ -24,6 +36,13 @@ describe('course data', () => {
       expect(qn.answer, qn.id).toBeGreaterThanOrEqual(0)
       expect(new Set(qn.options).size, qn.id).toBe(qn.options.length)
     }
+  })
+})
+
+describe('exam sections', () => {
+  it('lists 13 sections, each in the display order', () => {
+    expect(EXAM_SECTIONS).toHaveLength(13)
+    expect(EXAM_SECTIONS.map((s) => s.exam).lastIndexOf('IELTS')).toBeLessThan(EXAM_SECTIONS.map((s) => s.exam).indexOf('TOEIC'))
   })
 })
 

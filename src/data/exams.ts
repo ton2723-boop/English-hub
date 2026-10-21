@@ -1,5 +1,6 @@
 import { q } from '../lib/question'
 import type { ExamSection } from '../types'
+import { MORE_EXAM_SECTIONS } from './exams-more'
 
 const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN']
 
@@ -9,7 +10,7 @@ const IELTS_PASSAGE =
 const TOEIC_EMAIL =
   'To: All staff\nFrom: Facilities Department\nSubject: Parking garage maintenance\n\nPlease note that the north parking garage will be closed from Monday, 4 March, to Wednesday, 6 March, for resurfacing work. During this period, employees may park in the visitor lot on Elm Street at no charge. Please display your staff ID card on the dashboard. The garage will reopen on Thursday morning at 7:00 a.m. We apologise for any inconvenience.'
 
-export const EXAM_SECTIONS: ExamSection[] = [
+const BASE_EXAM_SECTIONS: ExamSection[] = [
   {
     id: 'ielts-reading',
     exam: 'IELTS',
@@ -245,6 +246,27 @@ export const EXAM_SECTIONS: ExamSection[] = [
     ],
   },
 ]
+
+/** Display order: IELTS by skill, then TOEIC by part. */
+const ORDER = [
+  'ielts-reading',
+  'ielts-headings',
+  'ielts-listening',
+  'ielts-listening-s3',
+  'ielts-writing-task1',
+  'ielts-writing',
+  'ielts-speaking',
+  'toeic-part2',
+  'toeic-part3',
+  'toeic-part4',
+  'toeic-part5',
+  'toeic-part6',
+  'toeic-part7',
+]
+
+export const EXAM_SECTIONS: ExamSection[] = [...BASE_EXAM_SECTIONS, ...MORE_EXAM_SECTIONS].sort(
+  (a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id),
+)
 
 export function findExamSection(id: string): ExamSection | undefined {
   return EXAM_SECTIONS.find((s) => s.id === id)

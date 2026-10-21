@@ -8,8 +8,9 @@
   - ผ่านระดับเมื่อถูก ≥ 4/6 ข้อ และต้องผ่านทุกระดับก่อนหน้า (`src/lib/scoring.ts`)
   - **ข้อสอบหลังเรียนล็อกไว้** จนกว่าจะทำแบบฝึกหัดได้ ≥ 60% ในทุกบทของระดับที่แนะนำให้เรียน (`postTestGate` ใน `src/lib/level.ts`)
   - ข้อฟังใช้ Web Speech API ของเบราว์เซอร์ (ไม่ต้องมีไฟล์เสียง)
-- **บทเรียน A1–C2** — ระดับละ 5 บท (รวม 30 บท) โดย 3 บทต่อระดับเป็น **ภาษาอังกฤษในที่ทำงาน** (อีเมล โทรศัพท์ ประชุม นำเสนอ เจรจา สัมภาษณ์งาน ฯลฯ) แต่ละบทมีเป้าหมาย can-do, คำศัพท์พร้อมคำแปลไทย, ไวยากรณ์ (อธิบายไทย/อังกฤษ), บทอ่าน และแบบฝึกหัดพร้อมเฉลย
-- **เตรียมสอบ** — IELTS Reading/Listening/Writing/Speaking และ TOEIC Part 2/5/7 พร้อมตารางเทียบ CEFR ↔ IELTS ↔ TOEIC
+- **บทเรียน A1–C2** — ระดับละ 7 บท (รวม 42 บท): ไวยากรณ์หลัก 2 บท, **ภาษาอังกฤษในที่ทำงาน** 3 บท, การเดินทาง 1 บท และชีวิตประจำวัน 1 บท ทุกบทมีเป้าหมาย can-do, คำศัพท์พร้อมคำแปลไทย, ไวยากรณ์ (อธิบายไทย/อังกฤษ), บทอ่าน และแบบฝึกหัด 8 ข้อพร้อมเฉลย (มีข้ออ่านและข้อฟังทุกบท)
+- **คลังคำศัพท์ & แฟลชการ์ด** — คำศัพท์ 210 คำจากทุกบท กรองตามระดับ ฟังเสียงได้ คำที่ยังไม่แม่นจะวนกลับมาก่อน ตอบ "จำได้" 3 ครั้งถือว่าจำได้แล้ว
+- **เตรียมสอบ** — 13 ชุด: IELTS (Reading: True/False/Not Given, Matching Headings · Listening: Section 1–2, Section 3 · Writing Task 1, Task 2 · Speaking) และ TOEIC (Part 2, 3, 4, 5, 6, 7) พร้อมตารางเทียบ CEFR ↔ IELTS ↔ TOEIC
 - **ความก้าวหน้า** — เปรียบเทียบผลก่อน–หลังเรียน รายทักษะ และจำนวนบทที่ฝึกแล้ว
 - ไม่มีเซิร์ฟเวอร์: เก็บข้อมูลใน `localStorage` ของเบราว์เซอร์
 
@@ -22,11 +23,11 @@ npm test         # ทดสอบระบบให้คะแนน
 npm run build    # สร้างไฟล์ใน dist/
 ```
 
-## Deploy บน GitHub Pages
+## Deploy
 
-มี workflow `.github/workflows/deploy.yml` ที่รันเทสต์และ build ทุกครั้งที่ push และจะ deploy ขึ้น GitHub Pages เฉพาะเมื่อ push ไปที่ default branch
+เว็บ deploy ด้วย **Vercel** ซึ่งเชื่อมกับ repo นี้ไว้ จะ build และอัปเดตเว็บเองทุกครั้งที่ push (Framework: Vite, Build: `npm run build`, Output: `dist`)
 
-ตั้งค่าครั้งแรก (ทำครั้งเดียว): ไปที่ **Settings → Pages → Build and deployment → Source** แล้วเลือก **GitHub Actions** เว็บจะอยู่ที่ `https://<username>.github.io/<repo>/`
+GitHub Actions (`.github/workflows/ci.yml`) รันเทสต์และ build ทุกครั้งที่ push เพื่อตรวจว่าโค้ดไม่พัง
 
 ## โครงสร้าง
 
@@ -35,7 +36,10 @@ npm run build    # สร้างไฟล์ใน dist/
 | `src/data/placement.ts` | คลังข้อสอบวัดระดับ และการสุ่มชุดข้อสอบ (`drawForm`) |
 | `src/data/courses.ts` | บทเรียนหลัก A1–C2 |
 | `src/data/courses-work.ts` | บทเรียนภาษาอังกฤษในที่ทำงาน |
-| `src/data/exams.ts` | ชุดฝึก IELTS / TOEIC |
+| `src/data/courses-life.ts` | บทเรียนการเดินทางและชีวิตประจำวัน |
+| `src/data/unit-extras.ts` | บทอ่านและแบบฝึกหัดเพิ่มเติมของบทเดิม |
+| `src/data/exams.ts`, `exams-more.ts` | ชุดฝึก IELTS / TOEIC |
+| `src/lib/flashcards.ts` | ชุดแฟลชการ์ดและลำดับการทบทวน |
 | `src/data/levels.ts` | คำอธิบายระดับ CEFR และค่าเทียบคะแนนสอบ |
 | `src/lib/scoring.ts` | การให้คะแนนและจัดระดับ |
 | `src/lib/i18n.ts` | ข้อความหน้าเว็บภาษาไทย/อังกฤษ |

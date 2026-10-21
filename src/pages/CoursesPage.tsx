@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { unitsForLevel } from '../data/courses'
 import { LEVEL_INFO } from '../data/levels'
+import { ThemeTag } from '../components/ThemeTag'
 import { useT } from '../lib/i18n'
 import { currentLevel, studyLevel, UNIT_PASS } from '../lib/level'
 import { useStore } from '../lib/store'
@@ -38,7 +39,7 @@ export function CoursesPage() {
                 const best = practice[u.id]
                 return (
                   <Link key={u.id} to={`/unit/${u.id}`} className="card unit-card">
-                    {u.theme === 'work' && <span className="tag tag-work">💼 {t('workTheme')}</span>}
+                    {u.theme && <ThemeTag theme={u.theme} />}
                     <h3>{tr(u.title)}</h3>
                     <p className="muted small">{u.grammar.title}</p>
                     {best !== undefined && (

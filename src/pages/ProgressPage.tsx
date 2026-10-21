@@ -3,18 +3,20 @@ import { UNITS } from '../data/courses'
 import { EXAM_SECTIONS } from '../data/exams'
 import { useT } from '../lib/i18n'
 import { postTestGate } from '../lib/level'
-import { useStore } from '../lib/store'
+import { ALL_CARDS } from '../lib/flashcards'
+import { MASTERED_BOX, useStore } from '../lib/store'
 import { CEFR_LEVELS, type PlacementLevel, type Skill, type TestResult } from '../types'
 
 const LEVEL_ORDER: PlacementLevel[] = ['Pre-A1', ...CEFR_LEVELS]
 
 export function ProgressPage() {
   const { t, lang } = useT()
-  const { tests, practice, reset } = useStore()
+  const { tests, practice, cards, reset } = useStore()
   const { pre, post } = tests
   const gate = postTestGate(tests, practice)
 
   const unitsDone = UNITS.filter((u) => practice[u.id] !== undefined).length
+  const wordsMastered = ALL_CARDS.filter((c) => (cards[c.key] ?? 0) >= MASTERED_BOX).length
   const examsDone = EXAM_SECTIONS.filter((s) => practice[s.id] !== undefined).length
   const fmt = (iso: string) => new Date(iso).toLocaleDateString(lang === 'th' ? 'th-TH' : 'en-GB')
 
@@ -71,6 +73,15 @@ export function ProgressPage() {
           </p>
           <div className="progress">
             <div style={{ width: `${(unitsDone / UNITS.length) * 100}%` }} />
+          </div>
+        </div>
+        <div className="card">
+          <h3>{t('vocabDone')}</h3>
+          <p className="big-score">
+            {wordsMastered} / {ALL_CARDS.length}
+          </p>
+          <div className="progress">
+            <div style={{ width: `${(wordsMastered / ALL_CARDS.length) * 100}%` }} />
           </div>
         </div>
         <div className="card">

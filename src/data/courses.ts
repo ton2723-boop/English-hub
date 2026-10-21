@@ -1,6 +1,8 @@
 import { q } from '../lib/question'
 import { CEFR_LEVELS, type CefrLevel, type Unit } from '../types'
+import { LIFE_UNITS } from './courses-life'
 import { WORK_UNITS } from './courses-work'
+import { UNIT_EXTRAS } from './unit-extras'
 
 const CORE_UNITS: Unit[] = [
   // ───────────── A1 ─────────────
@@ -555,9 +557,16 @@ const CORE_UNITS: Unit[] = [
   },
 ]
 
-/** Core units then workplace units, ordered by level. */
+/** Adds the reading and extra practice from unit-extras.ts. */
+function withExtras(unit: Unit): Unit {
+  const extra = UNIT_EXTRAS[unit.id]
+  if (!extra) return unit
+  return { ...unit, reading: unit.reading ?? extra.reading, practice: [...unit.practice, ...extra.practice] }
+}
+
+/** Core, workplace, then travel/life units, ordered by level. */
 export const UNITS: Unit[] = CEFR_LEVELS.flatMap((level) =>
-  [...CORE_UNITS, ...WORK_UNITS].filter((u) => u.level === level),
+  [...CORE_UNITS, ...WORK_UNITS, ...LIFE_UNITS].filter((u) => u.level === level).map(withExtras),
 )
 
 export function unitsForLevel(level: CefrLevel): Unit[] {

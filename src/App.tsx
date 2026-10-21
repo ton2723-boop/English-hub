@@ -9,6 +9,7 @@ import { ProgressPage } from './pages/ProgressPage'
 import { ResultPage } from './pages/ResultPage'
 import { TestPage } from './pages/TestPage'
 import { UnitPage } from './pages/UnitPage'
+import { VocabPage } from './pages/VocabPage'
 
 // HashRouter keeps deep links working on static hosts such as GitHub Pages.
 export function App() {
@@ -24,6 +25,7 @@ export function App() {
             <Route path="unit/:id" element={<UnitPage />} />
             <Route path="exams" element={<ExamsPage />} />
             <Route path="exams/:id" element={<ExamSectionPage />} />
+            <Route path="vocab" element={<VocabPage />} />
             <Route path="progress" element={<ProgressPage />} />
             <Route path="*" element={<NotFound />} />
           </Route>

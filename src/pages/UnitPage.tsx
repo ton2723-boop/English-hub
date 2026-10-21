@@ -2,6 +2,7 @@ import { Link, useParams } from 'react-router-dom'
 import { AudioButton } from '../components/AudioButton'
 import { PracticeQuiz } from '../components/PracticeQuiz'
 import { findUnit } from '../data/courses'
+import { ThemeTag } from '../components/ThemeTag'
 import { useT } from '../lib/i18n'
 import { speak, speechSupported } from '../lib/speech'
 import { useStore } from '../lib/store'
@@ -22,7 +23,7 @@ export function UnitPage() {
       <div className="level-head">
         <span className="level-pill">{unit.level}</span>
         <h1>{tr(unit.title)}</h1>
-        {unit.theme === 'work' && <span className="tag tag-work">💼 {t('workTheme')}</span>}
+        {unit.theme && <ThemeTag theme={unit.theme} />}
       </div>
 
       <section className="card">
