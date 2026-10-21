@@ -1,10 +1,14 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useT } from '../lib/i18n'
-import { useStore } from '../lib/store'
+import { useAuth } from '../lib/auth'
+import { useLang } from '../lib/lang'
+import { SyncBadge } from './SyncBadge'
 
 export function Layout() {
   const { t } = useT()
-  const { lang, setLang } = useStore()
+  const { lang, setLang } = useLang()
+  const { session } = useAuth()
+  const isOwner = session?.user.role === 'owner'
   const links = [
     { to: '/', label: t('navHome'), end: true },
     { to: '/test/pre', label: t('navTest') },
@@ -12,6 +16,7 @@ export function Layout() {
     { to: '/exams', label: t('navExams') },
     { to: '/vocab', label: t('navVocab') },
     { to: '/progress', label: t('navProgress') },
+    ...(isOwner ? [{ to: '/admin', label: t('navAdmin') }] : []),
   ]
   return (
     <>
@@ -27,13 +32,20 @@ export function Layout() {
               </NavLink>
             ))}
           </nav>
-          <div className="lang" role="group" aria-label="Language">
-            <button type="button" className={lang === 'th' ? 'active' : ''} onClick={() => setLang('th')}>
-              TH
-            </button>
-            <button type="button" className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>
-              EN
-            </button>
+          <div className="header-tools">
+            <NavLink to="/account" className="user-chip" title={t('navAccount')}>
+              👤 {session?.user.displayName}
+              {session?.demo && <span className="badge">{t('demoBadge')}</span>}
+            </NavLink>
+            <SyncBadge />
+            <div className="lang" role="group" aria-label="Language">
+              <button type="button" className={lang === 'th' ? 'active' : ''} onClick={() => setLang('th')}>
+                TH
+              </button>
+              <button type="button" className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>
+                EN
+              </button>
+            </div>
           </div>
         </div>
       </header>

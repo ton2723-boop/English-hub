@@ -118,6 +118,8 @@ h1 {
   gap: 16px;
   min-height: 60px;
   flex-wrap: wrap;
+  row-gap: 4px;
+  padding-top: 8px;
 }
 
 .brand {
@@ -130,8 +132,17 @@ h1 {
 .nav {
   display: flex;
   gap: 4px;
-  flex: 1;
+  order: 3;
+  flex-basis: 100%;
   overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
 }
 
 .nav a {
@@ -176,12 +187,8 @@ h1 {
     padding-top: 8px;
     padding-bottom: 8px;
   }
-  .nav {
-    order: 3;
-    flex-basis: 100%;
-  }
-  .lang {
-    margin-left: auto;
+  .header-tools {
+    gap: 6px;
   }
 }
 
@@ -827,4 +834,141 @@ a.card:hover {
 
 details.card summary {
   cursor: pointer;
+}
+
+/* ───── Accounts ───── */
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: var(--text);
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-chip.active {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sync {
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sync-error {
+  color: var(--bad);
+}
+
+@media (max-width: 720px) {
+  .sync-text {
+    display: none;
+  }
+}
+
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  gap: 12px;
+}
+
+.login-top {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-card h1 {
+  font-size: 1.6rem;
+  margin: 4px 0;
+}
+
+.login-brand {
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 14px 0;
+}
+
+.field span {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.field input,
+.search {
+  font: inherit;
+  color: inherit;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.field input:focus,
+.search:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+}
+
+.btn-block {
+  width: 100%;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.admin-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search {
+  flex: 1;
+  min-width: 200px;
+}
+
+.admin-row.disabled {
+  opacity: 0.6;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px 16px;
+  margin: 12px 0 0;
+}
+
+.admin-stats dt {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.admin-stats dd {
+  margin: 0;
+  font-weight: 600;
 }

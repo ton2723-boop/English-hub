@@ -1,5 +1,5 @@
 import type { Bilingual, Skill } from '../types'
-import { useStore } from './store'
+import { useLang } from './lang'
 
 const STRINGS = {
   appName: { th: 'English Hub', en: 'English Hub' },
@@ -8,6 +8,8 @@ const STRINGS = {
   navCourses: { th: 'บทเรียน', en: 'Courses' },
   navExams: { th: 'เตรียมสอบ', en: 'Exam prep' },
   navVocab: { th: 'คำศัพท์', en: 'Vocabulary' },
+  navAdmin: { th: 'ผู้ดูแล', en: 'Admin' },
+  navAccount: { th: 'บัญชี', en: 'Account' },
   navProgress: { th: 'ความก้าวหน้า', en: 'My progress' },
 
   heroTitle: { th: 'เรียนภาษาอังกฤษตามมาตรฐานสากล CEFR', en: 'Learn English with the international CEFR standard' },
@@ -140,12 +142,82 @@ const STRINGS = {
   unitsDone: { th: 'บทเรียนที่ทำแบบฝึกหัดแล้ว', en: 'Units practised' },
   examDone: { th: 'ชุดเตรียมสอบที่ฝึกแล้ว', en: 'Exam sets practised' },
   resetProgress: { th: 'ล้างข้อมูลทั้งหมด', en: 'Reset all progress' },
-  resetConfirm: { th: 'ต้องการล้างผลสอบและความก้าวหน้าทั้งหมดใช่ไหม?', en: 'Delete all test results and progress?' },
+  resetConfirm: { th: 'ต้องการล้างผลสอบและความก้าวหน้าทั้งหมดใช่ไหม? (ลบจากบัญชีด้วย ย้อนกลับไม่ได้)', en: 'Delete all test results and progress? This also clears your account and cannot be undone.' },
   storageNote: {
-    th: 'ข้อมูลถูกเก็บไว้ในเบราว์เซอร์ของคุณเท่านั้น',
-    en: 'Your progress is stored only in this browser.',
+    th: 'ความก้าวหน้าบันทึกไว้ในบัญชีของคุณ เข้าสู่ระบบเครื่องไหนก็เรียนต่อได้',
+    en: 'Your progress is saved to your account, so you can continue on any device.',
   },
   date: { th: 'วันที่', en: 'Date' },
+  // ── Accounts ──
+  loginTitle: { th: 'เข้าสู่ระบบ', en: 'Sign in' },
+  registerTitle: { th: 'สมัครสมาชิก', en: 'Create account' },
+  loginIntro: {
+    th: 'เข้าสู่ระบบเพื่อเรียน ทำแบบทดสอบ และเก็บความก้าวหน้าไว้ใช้ได้ทุกเครื่อง',
+    en: 'Sign in to study, take tests and keep your progress on every device.',
+  },
+  username: { th: 'ชื่อผู้ใช้', en: 'Username' },
+  usernameHint: { th: '3–30 ตัว: a–z, 0–9, จุด, ขีดกลาง, ขีดล่าง', en: '3–30 characters: a–z, 0–9, dot, dash, underscore' },
+  displayName: { th: 'ชื่อที่แสดง', en: 'Display name' },
+  password: { th: 'รหัสผ่าน', en: 'Password' },
+  passwordHint: { th: 'อย่างน้อย 8 ตัวอักษร', en: 'At least 8 characters' },
+  confirmPassword: { th: 'ยืนยันรหัสผ่าน', en: 'Confirm password' },
+  passwordMismatch: { th: 'รหัสผ่านทั้งสองช่องไม่ตรงกัน', en: 'The passwords do not match' },
+  signIn: { th: 'เข้าสู่ระบบ', en: 'Sign in' },
+  signUp: { th: 'สมัครสมาชิก', en: 'Sign up' },
+  noAccount: { th: 'ยังไม่มีบัญชี?', en: "Don't have an account?" },
+  haveAccount: { th: 'มีบัญชีแล้ว?', en: 'Already have an account?' },
+  pleaseWait: { th: 'กรุณารอสักครู่…', en: 'Please wait…' },
+  demoMode: { th: 'ทดลองใช้ (โหมดทดลอง)', en: 'Try demo mode' },
+  demoNote: {
+    th: 'ยังไม่ได้เชื่อมเซิร์ฟเวอร์ (VITE_API_URL) — ใช้โหมดทดลองได้ ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น',
+    en: 'No server is configured (VITE_API_URL). Demo mode keeps data in this browser only.',
+  },
+  demoBadge: { th: 'โหมดทดลอง', en: 'Demo' },
+  logout: { th: 'ออกจากระบบ', en: 'Sign out' },
+  accountTitle: { th: 'บัญชีของฉัน', en: 'My account' },
+  roleOwner: { th: 'เจ้าของระบบ', en: 'Owner' },
+  roleLearner: { th: 'ผู้เรียน', en: 'Learner' },
+  changePassword: { th: 'เปลี่ยนรหัสผ่าน', en: 'Change password' },
+  oldPassword: { th: 'รหัสผ่านเดิม', en: 'Current password' },
+  newPassword: { th: 'รหัสผ่านใหม่', en: 'New password' },
+  passwordChanged: {
+    th: 'เปลี่ยนรหัสผ่านแล้ว (เครื่องอื่นที่ล็อกอินไว้จะถูกให้ออกจากระบบ)',
+    en: 'Password changed. Other devices have been signed out.',
+  },
+  syncLoading: { th: 'กำลังโหลดข้อมูล…', en: 'Loading…' },
+  syncSaving: { th: 'กำลังบันทึก…', en: 'Saving…' },
+  syncSaved: { th: 'บันทึกแล้ว', en: 'Saved' },
+  syncError: { th: 'บันทึกไม่สำเร็จ', en: 'Not saved' },
+  syncLocal: { th: 'เก็บในเบราว์เซอร์นี้', en: 'Saved in this browser' },
+  syncRetryNote: {
+    th: 'ระบบจะลองบันทึกใหม่เมื่อคุณเรียนต่อ ข้อมูลยังเก็บไว้ในเครื่องนี้',
+    en: 'It will retry on your next change; your progress is kept on this device.',
+  },
+  adminTitle: { th: 'ผู้ดูแล: ผู้เรียนทั้งหมด', en: 'Admin: all learners' },
+  adminIntro: {
+    th: 'ดูผลทดสอบก่อน–หลังเรียน บทที่ผ่าน และคำศัพท์ที่จำได้ของผู้เรียนทุกคน',
+    en: "See every learner's pre/post results, units passed and words mastered.",
+  },
+  refresh: { th: 'รีเฟรช', en: 'Refresh' },
+  search: { th: 'ค้นหาชื่อ / ชื่อผู้ใช้', en: 'Search name / username' },
+  learners: { th: 'ผู้เรียน', en: 'Learners' },
+  colLearner: { th: 'ผู้เรียน', en: 'Learner' },
+  colPre: { th: 'ก่อนเรียน', en: 'Pre-test' },
+  colPost: { th: 'หลังเรียน', en: 'Post-test' },
+  colUnits: { th: 'บทที่ผ่าน', en: 'Units passed' },
+  colWords: { th: 'คำที่จำได้', en: 'Words' },
+  colLastActive: { th: 'ใช้งานล่าสุด', en: 'Last active' },
+  colStatus: { th: 'สถานะ', en: 'Status' },
+  active: { th: 'ใช้งานได้', en: 'Active' },
+  inactive: { th: 'ปิดอยู่', en: 'Disabled' },
+  disable: { th: 'ปิดบัญชี', en: 'Disable' },
+  enable: { th: 'เปิดบัญชี', en: 'Enable' },
+  resetPassword: { th: 'ตั้งรหัสใหม่', en: 'Reset password' },
+  resetPasswordPrompt: { th: 'รหัสผ่านใหม่ของ', en: 'New password for' },
+  resetPasswordDone: { th: 'ตั้งรหัสผ่านใหม่แล้ว แจ้งรหัสนี้ให้ผู้เรียน:', en: 'Password reset. Give this password to the learner:' },
+  confirmDisable: { th: 'ปิดบัญชีนี้? ผู้เรียนจะเข้าสู่ระบบไม่ได้จนกว่าจะเปิดอีกครั้ง', en: 'Disable this account? The learner cannot sign in until it is enabled again.' },
+  you: { th: 'คุณ', en: 'you' },
+  noUsers: { th: 'ยังไม่มีผู้เรียน', en: 'No learners yet' },
   notFound: { th: 'ไม่พบหน้านี้', en: 'Page not found' },
 } satisfies Record<string, Bilingual>
 
@@ -159,7 +231,7 @@ const SKILL_KEYS: Record<Skill, StringKey> = {
 }
 
 export function useT() {
-  const { lang } = useStore()
+  const { lang } = useLang()
   const t = (key: StringKey) => STRINGS[key][lang]
   /** Pick the current language from any bilingual value. */
   const tr = (b: Bilingual) => b[lang]

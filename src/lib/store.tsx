@@ -1,32 +1,61 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
-import type { Lang, TestKind, TestResult } from '../types'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import type { TestResult } from '../types'
+import { ApiError, callApi } from './api'
+import { useAuth } from './auth'
+import { mergeProgress, sameProgress, type SyncedProgress } from './merge'
 
-export interface Progress {
-  lang: Lang
-  tests: Partial<Record<TestKind, TestResult>>
-  /** Best practice score per unit / exam section, as a fraction 0–1. */
-  practice: Record<string, number>
-  /** Flashcard box per card key (0 = new/again … MASTERED_BOX = mastered). */
-  cards: Record<string, number>
-}
+export type Progress = SyncedProgress
 
-const KEY = 'english-hub:v1'
-const EMPTY: Progress = { lang: 'th', tests: {}, practice: {}, cards: {} }
+/** idle = nothing to save yet; local = demo mode (this browser only). */
+export type SyncStatus = 'loading' | 'idle' | 'saving' | 'saved' | 'error' | 'local'
+
+const LEGACY_KEY = 'english-hub:v1'
+const EMPTY: Progress = { tests: {}, practice: {}, cards: {} }
+/** Wait this long after the last change before uploading. */
+const SAVE_DELAY_MS = 1500
 
 export const MASTERED_BOX = 3
 
-function load(): Progress {
+function keyFor(userId: string) {
+  return `${LEGACY_KEY}:${userId}`
+}
+
+function readLocal(key: string): Progress {
   try {
-    const raw = localStorage.getItem(KEY)
-    if (!raw) return EMPTY
-    return { ...EMPTY, ...JSON.parse(raw) }
+    const raw = localStorage.getItem(key)
+    return raw ? mergeProgress({}, JSON.parse(raw)) : EMPTY
   } catch {
     return EMPTY
   }
 }
 
+function writeLocal(key: string, p: Progress) {
+  try {
+    localStorage.setItem(key, JSON.stringify(p))
+  } catch {
+    // Storage may be unavailable (private mode); the server copy still works.
+  }
+}
+
+/**
+ * Progress from before accounts existed lives under the old key. It is folded
+ * into the first account that signs in on this device (and removed once saved).
+ */
+function readLegacy(): Progress {
+  return readLocal(LEGACY_KEY)
+}
+
+function dropLegacy() {
+  try {
+    localStorage.removeItem(LEGACY_KEY)
+  } catch {
+    // ignore
+  }
+}
+
 interface Store extends Progress {
-  setLang: (lang: Lang) => void
+  sync: SyncStatus
+  syncError: string
   saveTest: (result: TestResult) => void
   savePractice: (id: string, fraction: number) => void
   /** Moves a flashcard up a box when known, back to box 0 when not. */
@@ -36,19 +65,71 @@ interface Store extends Progress {
 
 const StoreContext = createContext<Store | null>(null)
 
+/** Mount with key={userId} so switching accounts starts fresh. */
 export function StoreProvider({ children }: { children: ReactNode }) {
-  const [progress, setProgress] = useState<Progress>(load)
+  const { session, logout } = useAuth()
+  const userId = session?.user.userId ?? 'anon'
+  const demo = Boolean(session?.demo)
+  const token = session?.token ?? ''
+  const localKey = keyFor(userId)
 
+  const [progress, setProgress] = useState<Progress>(() => mergeProgress(readLocal(localKey), readLegacy()))
+  const [sync, setSync] = useState<SyncStatus>(demo ? 'local' : 'loading')
+  const [syncError, setSyncError] = useState('')
+  /** Changes made before the server copy loaded must not be uploaded alone. */
+  const hydrated = useRef(demo)
+  const replaceNext = useRef(false)
+  const lastSaved = useRef<Progress | null>(null)
+
+  const fail = useCallback(
+    (e: unknown) => {
+      if (e instanceof ApiError && e.authError) return logout(e.message)
+      setSync('error')
+      setSyncError(e instanceof Error ? e.message : String(e))
+    },
+    [logout],
+  )
+
+  // Load the server copy once and merge it with what this device has.
   useEffect(() => {
-    try {
-      localStorage.setItem(KEY, JSON.stringify(progress))
-    } catch {
-      // Storage may be unavailable (private mode); progress then lasts for this visit only.
+    if (demo) return
+    let cancelled = false
+    callApi<{ progress: Progress }>('getProgress', { token })
+      .then(({ progress: server }) => {
+        if (cancelled) return
+        const serverCopy = mergeProgress({}, server)
+        lastSaved.current = serverCopy
+        hydrated.current = true
+        setProgress((local) => mergeProgress(serverCopy, local))
+        setSync('idle')
+      })
+      .catch((e) => !cancelled && fail(e))
+    return () => {
+      cancelled = true
     }
-    document.documentElement.lang = progress.lang
-  }, [progress])
+  }, [demo, token, fail])
 
-  const setLang = useCallback((lang: Lang) => setProgress((p) => ({ ...p, lang })), [])
+  // Keep a local copy and upload changes shortly after they happen.
+  useEffect(() => {
+    writeLocal(localKey, progress)
+    dropLegacy()
+    if (demo || !hydrated.current) return
+    if (lastSaved.current && sameProgress(lastSaved.current, progress) && !replaceNext.current) return
+    const timer = setTimeout(() => {
+      const replace = replaceNext.current
+      replaceNext.current = false
+      setSync('saving')
+      callApi<{ progress: Progress }>('saveProgress', { token, progress, replace })
+        .then((r) => {
+          lastSaved.current = mergeProgress({}, r.progress)
+          setSync('saved')
+          setSyncError('')
+        })
+        .catch(fail)
+    }, SAVE_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [progress, demo, token, localKey, fail])
+
   const saveTest = useCallback(
     (result: TestResult) => setProgress((p) => ({ ...p, tests: { ...p.tests, [result.kind]: result } })),
     [],
@@ -66,11 +147,14 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       }),
     [],
   )
-  const reset = useCallback(() => setProgress((p) => ({ ...EMPTY, lang: p.lang })), [])
+  const reset = useCallback(() => {
+    replaceNext.current = true
+    setProgress({ tests: {}, practice: {}, cards: {} })
+  }, [])
 
   const value = useMemo(
-    () => ({ ...progress, setLang, saveTest, savePractice, rateCard, reset }),
-    [progress, setLang, saveTest, savePractice, rateCard, reset],
+    () => ({ ...progress, sync, syncError, saveTest, savePractice, rateCard, reset }),
+    [progress, sync, syncError, saveTest, savePractice, rateCard, reset],
   )
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
