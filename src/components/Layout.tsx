@@ -23,7 +23,7 @@ export function Layout() {
       <header className="header">
         <div className="container header-inner">
           <NavLink to="/" className="brand">
-            📘 {t('appName')}
+            📘 <span className="brand-text">{t('appName')}</span>
           </NavLink>
           <nav className="nav">
             {links.map((l) => (

@@ -5,7 +5,7 @@ import { LangProvider } from './lib/lang'
 import { StoreProvider } from './lib/store'
 import { AccountPage } from './pages/AccountPage'
 import { AdminPage } from './pages/AdminPage'
-import { CoursesPage } from './pages/CoursesPage'
+import { CategoryPage, CoursesPage } from './pages/CoursesPage'
 import { ExamSectionPage, ExamsPage } from './pages/ExamsPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
@@ -39,6 +39,7 @@ function Gate() {
             <Route path="test/:kind" element={<TestPage />} />
             <Route path="result/:kind" element={<ResultPage />} />
             <Route path="courses" element={<CoursesPage />} />
+            <Route path="courses/:category" element={<CategoryPage />} />
             <Route path="unit/:id" element={<UnitPage />} />
             <Route path="exams" element={<ExamsPage />} />
             <Route path="exams/:id" element={<ExamSectionPage />} />

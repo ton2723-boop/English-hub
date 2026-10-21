@@ -1,19 +1,22 @@
 import { Link } from 'react-router-dom'
 import { UNITS } from '../data/courses'
 import { EXAM_SECTIONS } from '../data/exams'
+import { badges } from '../lib/badges'
 import { useT } from '../lib/i18n'
 import { postTestGate } from '../lib/level'
 import { ALL_CARDS } from '../lib/flashcards'
 import { MASTERED_BOX, useStore } from '../lib/store'
+import { currentStreak, longestStreak } from '../lib/streak'
 import { CEFR_LEVELS, type PlacementLevel, type Skill, type TestResult } from '../types'
 
 const LEVEL_ORDER: PlacementLevel[] = ['Pre-A1', ...CEFR_LEVELS]
 
 export function ProgressPage() {
-  const { t, lang } = useT()
-  const { tests, practice, cards, reset } = useStore()
+  const { t, tr, lang } = useT()
+  const store = useStore()
+  const { tests, practice, cards, focus, days, reset } = store
   const { pre, post } = tests
-  const gate = postTestGate(tests, practice)
+  const gate = postTestGate(tests, practice, focus)
 
   const unitsDone = UNITS.filter((u) => practice[u.id] !== undefined).length
   const wordsMastered = ALL_CARDS.filter((c) => (cards[c.key] ?? 0) >= MASTERED_BOX).length
@@ -23,6 +26,29 @@ export function ProgressPage() {
   return (
     <section>
       <h1>{t('progressTitle')}</h1>
+
+      <div className="grid-2">
+        <div className="card streak-card">
+          <h2>🔥 {t('streakTitle')}</h2>
+          <p className="big-score">
+            {currentStreak(days)} {t('days')}
+          </p>
+          <p className="muted small">
+            🏅 {t('best')}: {longestStreak(days)} {t('days')} · 📅 {days.length} {t('days')}
+          </p>
+        </div>
+        <div className="card">
+          <h2>🏆 {t('badgesTitle')}</h2>
+          <div className="badge-grid">
+            {badges(store).map((b) => (
+              <span key={b.id} className={`badge-item ${b.earned ? 'earned' : ''}`} title={tr(b.title)}>
+                <span className="badge-icon">{b.icon}</span>
+                <span className="small">{tr(b.title)}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
 
       <div className="card">
         <h2>{t('beforeAfter')}</h2>

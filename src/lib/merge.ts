@@ -1,18 +1,27 @@
-import type { TestKind, TestResult } from '../types'
+import type { TestKind, TestResult, UnitTheme } from '../types'
 
 /** The part of a learner's progress that is synced to the server. */
 export interface SyncedProgress {
   tests: Partial<Record<TestKind, TestResult>>
   practice: Record<string, number>
   cards: Record<string, number>
+  /** Category the learner chose; decides which units unlock the post-test. */
+  focus?: UnitTheme
+  /** Local dates (YYYY-MM-DD) with any study activity, oldest first. */
+  days: string[]
 }
 
 const MASTERED_BOX = 3
+const THEMES = ['work', 'kids', 'travel', 'life']
+const DAY_RE = /^\d{4}-\d{2}-\d{2}$/
+/** Keep about a year of study days. */
+const MAX_DAYS = 400
 
 /**
  * Combines two copies of progress (e.g. this device and the server).
  * Must match mergeProgress_ in apps-script/Code.gs — tests/parity.test.ts checks both.
- * tests: newer result wins; practice: highest score; cards: b (the newer copy) wins.
+ * tests: newer result wins; practice: highest score; cards & focus: b (the newer copy) wins;
+ * days: union of both.
  */
 export function mergeProgress(a: Partial<SyncedProgress> = {}, b: Partial<SyncedProgress> = {}): SyncedProgress {
   const tests: SyncedProgress['tests'] = {}
@@ -36,7 +45,13 @@ export function mergeProgress(a: Partial<SyncedProgress> = {}, b: Partial<Synced
       if (Number.isFinite(v)) cards[k] = Math.min(Math.max(Math.round(v), 0), MASTERED_BOX)
     }
   }
-  return { tests, practice, cards }
+  const focus = [b.focus, a.focus].find((f) => THEMES.includes(String(f))) as UnitTheme | undefined
+  const days = [...new Set([...(a.days ?? []), ...(b.days ?? [])].map(String).filter((d) => DAY_RE.test(d)))]
+    .sort()
+    .slice(-MAX_DAYS)
+  const merged: SyncedProgress = { tests, practice, cards, days }
+  if (focus) merged.focus = focus
+  return merged
 }
 
 /** True when both copies hold the same data (so nothing needs uploading). */
@@ -46,5 +61,11 @@ export function sameProgress(a: SyncedProgress, b: SyncedProgress): boolean {
 
 function normalize(p: SyncedProgress) {
   const sortKeys = (o: Record<string, unknown>) => Object.fromEntries(Object.entries(o).sort(([x], [y]) => x.localeCompare(y)))
-  return { tests: sortKeys(p.tests as Record<string, unknown>), practice: sortKeys(p.practice), cards: sortKeys(p.cards) }
+  return {
+    tests: sortKeys(p.tests as Record<string, unknown>),
+    practice: sortKeys(p.practice),
+    cards: sortKeys(p.cards),
+    focus: p.focus ?? null,
+    days: [...p.days].sort(),
+  }
 }

@@ -1,8 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import type { TestResult } from '../types'
+import type { TestResult, UnitTheme } from '../types'
 import { ApiError, callApi } from './api'
 import { useAuth } from './auth'
 import { mergeProgress, sameProgress, type SyncedProgress } from './merge'
+import { localDay } from './streak'
 
 export type Progress = SyncedProgress
 
@@ -10,7 +11,7 @@ export type Progress = SyncedProgress
 export type SyncStatus = 'loading' | 'idle' | 'saving' | 'saved' | 'error' | 'local'
 
 const LEGACY_KEY = 'english-hub:v1'
-const EMPTY: Progress = { tests: {}, practice: {}, cards: {} }
+const EMPTY: Progress = { tests: {}, practice: {}, cards: {}, days: [] }
 /** Wait this long after the last change before uploading. */
 const SAVE_DELAY_MS = 1500
 
@@ -60,7 +61,14 @@ interface Store extends Progress {
   savePractice: (id: string, fraction: number) => void
   /** Moves a flashcard up a box when known, back to box 0 when not. */
   rateCard: (key: string, known: boolean) => void
+  setFocus: (focus: UnitTheme) => void
   reset: () => void
+}
+
+/** Records today as a study day (for the streak). */
+function withToday(p: Progress): Progress {
+  const today = localDay()
+  return p.days.includes(today) ? p : { ...p, days: [...p.days, today] }
 }
 
 const StoreContext = createContext<Store | null>(null)
@@ -131,30 +139,31 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   }, [progress, demo, token, localKey, fail])
 
   const saveTest = useCallback(
-    (result: TestResult) => setProgress((p) => ({ ...p, tests: { ...p.tests, [result.kind]: result } })),
+    (result: TestResult) => setProgress((p) => withToday({ ...p, tests: { ...p.tests, [result.kind]: result } })),
     [],
   )
   const savePractice = useCallback(
     (id: string, fraction: number) =>
-      setProgress((p) => ({ ...p, practice: { ...p.practice, [id]: Math.max(fraction, p.practice[id] ?? 0) } })),
+      setProgress((p) => withToday({ ...p, practice: { ...p.practice, [id]: Math.max(fraction, p.practice[id] ?? 0) } })),
     [],
   )
   const rateCard = useCallback(
     (key: string, known: boolean) =>
       setProgress((p) => {
         const box = known ? Math.min((p.cards[key] ?? 0) + 1, MASTERED_BOX) : 0
-        return { ...p, cards: { ...p.cards, [key]: box } }
+        return withToday({ ...p, cards: { ...p.cards, [key]: box } })
       }),
     [],
   )
+  const setFocus = useCallback((focus: UnitTheme) => setProgress((p) => ({ ...p, focus })), [])
   const reset = useCallback(() => {
     replaceNext.current = true
-    setProgress({ tests: {}, practice: {}, cards: {} })
+    setProgress(EMPTY)
   }, [])
 
   const value = useMemo(
-    () => ({ ...progress, sync, syncError, saveTest, savePractice, rateCard, reset }),
-    [progress, sync, syncError, saveTest, savePractice, rateCard, reset],
+    () => ({ ...progress, sync, syncError, saveTest, savePractice, rateCard, setFocus, reset }),
+    [progress, sync, syncError, saveTest, savePractice, rateCard, setFocus, reset],
   )
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }

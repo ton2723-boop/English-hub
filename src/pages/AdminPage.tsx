@@ -3,6 +3,7 @@ import { UNITS } from '../data/courses'
 import { ApiError, callApi } from '../lib/api'
 import { useAuth } from '../lib/auth'
 import { ALL_CARDS } from '../lib/flashcards'
+import { categoryInfo, isCategory } from '../lib/categories'
 import { useT } from '../lib/i18n'
 import { NotFound } from './NotFound'
 
@@ -22,11 +23,13 @@ interface AdminUser {
     postScore: string
     unitsPassed: number
     wordsMastered: number
+    focus: string
+    studyDays: number
   }
 }
 
 export function AdminPage() {
-  const { t, lang } = useT()
+  const { t, tr, lang } = useT()
   const { session, logout } = useAuth()
   const [users, setUsers] = useState<AdminUser[]>()
   const [error, setError] = useState('')
@@ -139,6 +142,16 @@ export function AdminPage() {
                   <dt>{t('colWords')}</dt>
                   <dd>
                     {s.wordsMastered}/{ALL_CARDS.length}
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t('myCategory')}</dt>
+                  <dd>{isCategory(s.focus) ? `${categoryInfo(s.focus).icon} ${tr(categoryInfo(s.focus).title)}` : '—'}</dd>
+                </div>
+                <div>
+                  <dt>📅 {t('streakTitle')}</dt>
+                  <dd>
+                    {s.studyDays ?? 0} {t('days')}
                   </dd>
                 </div>
                 <div>

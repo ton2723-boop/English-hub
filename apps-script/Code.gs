@@ -10,7 +10,7 @@
  * (ScriptProperties sess_<token>), ล็อกอินผิด 5 ครั้งล็อก 15 นาที (lock_<username>)
  */
 
-const BACKEND_VERSION = '2026-10-21.1';
+const BACKEND_VERSION = '2026-10-21.2';
 
 /** ชื่อชีตและหัวคอลัมน์ — เพิ่มคอลัมน์ต่อท้ายเท่านั้น ห้ามสลับ/แทรกกลาง */
 const SHEETS_ = {
@@ -29,6 +29,9 @@ const PROGRESS_MAX_CHARS_ = 45000;
 const EXAM_ID_RE_ = /^(ielts|toeic)-/;
 const UNIT_PASS_ = 0.6;
 const MASTERED_BOX_ = 3;
+const THEMES_ = ['work', 'kids', 'travel', 'life'];
+const DAY_RE_ = /^\d{4}-\d{2}-\d{2}$/;
+const MAX_DAYS_ = 400;
 
 /* ================= HTTP ================= */
 
@@ -353,7 +356,8 @@ function sanitizeProgress_(p) {
 
 /**
  * รวมความก้าวหน้าสองชุด — ต้องตรงกับ mergeProgress ใน src/lib/merge.ts (แก้ต้องแก้คู่ ; tests/parity ตรวจ)
- * tests: ผลที่วันที่ใหม่กว่า ; practice: คะแนนสูงสุด ; cards: ค่าจากชุดที่ส่งมาใหม่ (b) ทับ
+ * tests: ผลที่วันที่ใหม่กว่า ; practice: คะแนนสูงสุด ; cards และ focus: ค่าจากชุดที่ส่งมาใหม่ (b) ทับ ;
+ * days: รวมวันที่เรียนของทั้งสองชุด
  */
 function mergeProgress_(a, b) {
   a = a || {}; b = b || {};
@@ -377,7 +381,15 @@ function mergeProgress_(a, b) {
       if (isFinite(v)) cards[k] = Math.min(Math.max(Math.round(v), 0), MASTERED_BOX_);
     });
   });
-  return { tests: tests, practice: practice, cards: cards };
+  const focus = [b.focus, a.focus].filter(f => THEMES_.indexOf(String(f)) >= 0)[0];
+  const seen = {};
+  const days = (a.days || []).concat(b.days || []).map(String)
+    .filter(d => DAY_RE_.test(d) && !seen[d] && (seen[d] = true))
+    .sort()
+    .slice(-MAX_DAYS_);
+  const merged = { tests: tests, practice: practice, cards: cards, days: days };
+  if (focus) merged.focus = focus;
+  return merged;
 }
 
 /** สรุปผลรายคนสำหรับหน้าผู้ดูแล — ต้องตรงกับ summarizeProgress ใน src/lib/merge.ts */
@@ -399,6 +411,9 @@ function summarizeProgress_(p) {
     unitsPracticed: unitKeys.length,
     examsPracticed: examKeys.length,
     wordsMastered: Object.keys(cards).filter(k => Number(cards[k]) >= MASTERED_BOX_).length,
+    focus: THEMES_.indexOf(String(p.focus)) >= 0 ? p.focus : '',
+    studyDays: Array.isArray(p.days) ? p.days.length : 0,
+    lastStudyDay: Array.isArray(p.days) && p.days.length ? String(p.days[p.days.length - 1]) : '',
   };
 }
 

@@ -22,6 +22,8 @@ function randomProgress(r: () => number) {
     tests: { pre: test('pre'), post: test('post') },
     practice: obj(() => pick([0, 0.25, 0.5, 0.75, 1, 1.4, -0.2, 'x'])),
     cards: obj(() => pick([0, 1, 2, 3, 7, -1, 2.6])),
+    focus: pick(['work', 'kids', 'travel', 'life', 'nope', undefined]),
+    days: ['2026-10-01', '2026-10-02', '2026-10-05', 'bad', '2026-9-1'].filter(() => r() < 0.5),
   }
 }
 
@@ -47,5 +49,12 @@ describe('mergeProgress parity (src/lib/merge.ts ↔ Code.gs)', () => {
     expect(m.tests.pre?.level).toBe('A2')
     expect(m.practice.u).toBe(0.9)
     expect(m.cards.w).toBe(1)
+  })
+
+  it('takes the newer focus, falls back to the older one, and unions study days', () => {
+    const m = mergeProgress({ focus: 'work', days: ['2026-10-02', '2026-10-01'] }, { days: ['2026-10-02', '2026-10-03'] })
+    expect(m.focus).toBe('work')
+    expect(m.days).toEqual(['2026-10-01', '2026-10-02', '2026-10-03'])
+    expect(mergeProgress({ focus: 'work' }, { focus: 'kids' }).focus).toBe('kids')
   })
 })

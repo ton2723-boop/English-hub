@@ -16,7 +16,8 @@ export function speak(text: string, rate = 0.9): Promise<void> {
   return new Promise((resolve) => {
     if (!speechSupported()) return resolve()
     window.speechSynthesis.cancel()
-    const u = new SpeechSynthesisUtterance(text)
+    // Emoji in kids' vocabulary would be read out by name ("red circle").
+    const u = new SpeechSynthesisUtterance(text.replace(/\p{Extended_Pictographic}|\uFE0F/gu, ''))
     u.lang = 'en-GB'
     u.rate = rate
     const voice = englishVoice()

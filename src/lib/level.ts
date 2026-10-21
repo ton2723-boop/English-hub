@@ -1,5 +1,5 @@
 import { unitsForLevel } from '../data/courses'
-import type { CefrLevel, PlacementLevel, TestKind, TestResult, Unit } from '../types'
+import type { CefrLevel, PlacementLevel, TestKind, TestResult, Unit, UnitTheme } from '../types'
 
 /** Latest known level: the post-test result if taken, otherwise the pre-test. */
 export function currentLevel(tests: Partial<Record<TestKind, TestResult>>): PlacementLevel | undefined {
@@ -22,16 +22,27 @@ export interface PostTestGate {
   unlocked: boolean
   /** Level whose units must be passed; undefined until the pre-test is taken. */
   level?: CefrLevel
+  /** The learner has not chosen a category yet. */
+  needsFocus: boolean
   units: { unit: Unit; best?: number; passed: boolean }[]
 }
 
-/** The post-test opens once every unit at the pre-test's study level scores ≥ UNIT_PASS. */
-export function postTestGate(tests: Partial<Record<TestKind, TestResult>>, practice: Record<string, number>): PostTestGate {
-  if (!tests.pre) return { unlocked: false, units: [] }
+/**
+ * The post-test opens once the core grammar units plus the units of the
+ * learner's chosen category, at the pre-test's study level, all score ≥ UNIT_PASS.
+ */
+export function postTestGate(
+  tests: Partial<Record<TestKind, TestResult>>,
+  practice: Record<string, number>,
+  focus: UnitTheme | undefined,
+): PostTestGate {
+  if (!tests.pre) return { unlocked: false, needsFocus: !focus, units: [] }
   const level = studyLevel(tests.pre.level)
-  const units = unitsForLevel(level).map((unit) => {
+  if (!focus) return { unlocked: false, needsFocus: true, level, units: [] }
+  const required = unitsForLevel(level).filter((u) => !u.theme || u.theme === focus)
+  const units = required.map((unit) => {
     const best = practice[unit.id]
     return { unit, best, passed: (best ?? 0) >= UNIT_PASS }
   })
-  return { unlocked: units.every((u) => u.passed), level, units }
+  return { unlocked: units.every((u) => u.passed), needsFocus: false, level, units }
 }

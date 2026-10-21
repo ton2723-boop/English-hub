@@ -19,7 +19,7 @@ export function TestPage() {
 
 function PlacementTest({ kind }: { kind: TestKind }) {
   const { t, tr } = useT()
-  const { tests, practice, saveTest } = useStore()
+  const { tests, practice, focus, saveTest } = useStore()
   const navigate = useNavigate()
 
   const [form, setForm] = useState<LevelBlock[]>()
@@ -30,7 +30,7 @@ function PlacementTest({ kind }: { kind: TestKind }) {
 
   const title = kind === 'pre' ? t('preTest') : t('postTest')
   const previous = tests[kind]
-  const gate = postTestGate(tests, practice)
+  const gate = postTestGate(tests, practice, focus)
   const locked = kind === 'post' && !gate.unlocked
 
   function start() {
@@ -51,7 +51,15 @@ function PlacementTest({ kind }: { kind: TestKind }) {
             {t('noPre')} <Link to="/test/pre">{t('preTest')} →</Link>
           </p>
         )}
-        {locked && gate.level && (
+        {locked && tests.pre && gate.needsFocus && (
+          <div className="notice">
+            <p>🔒 {t('chooseFocusFirst')}</p>
+            <Link to="/courses" className="btn btn-secondary">
+              {t('chooseCategoryBtn')}
+            </Link>
+          </div>
+        )}
+        {locked && gate.level && !gate.needsFocus && (
           <div className="notice">
             <p>
               🔒 {t('postLocked')} {gate.level}

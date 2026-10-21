@@ -14,17 +14,21 @@ export function UnitPage() {
   const { practice, savePractice } = useStore()
   const unit = findUnit(id)
   if (!unit) return <NotFound />
+  const cat = unit.theme ?? 'core'
 
   return (
     <article className="narrow">
-      <Link to={`/courses#${unit.level}`} className="back">
+      <Link to={`/courses/${cat}#${unit.level}`} className="back">
         {t('backToCourses')}
       </Link>
-      <div className="level-head">
-        <span className="level-pill">{unit.level}</span>
+      <header className={`unit-hero cat-${cat}`}>
+        <div className="unit-hero-tags">
+          <span className="level-pill light">{unit.level}</span>
+          <ThemeTag theme={cat} audience={unit.audience} />
+        </div>
         <h1>{tr(unit.title)}</h1>
-        {unit.theme && <ThemeTag theme={unit.theme} />}
-      </div>
+        <p>{unit.grammar.title}</p>
+      </header>
 
       <section className="card">
         <h2>🎯 {t('goals')}</h2>

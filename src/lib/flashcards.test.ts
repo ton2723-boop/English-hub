@@ -3,7 +3,7 @@ import { ALL_CARDS, nextCard } from './flashcards'
 
 describe('flashcards', () => {
   it('collects unique cards from every unit', () => {
-    expect(ALL_CARDS.length).toBe(42 * 5)
+    expect(ALL_CARDS.length).toBe(64 * 5)
     expect(new Set(ALL_CARDS.map((c) => c.key)).size).toBe(ALL_CARDS.length)
   })
 

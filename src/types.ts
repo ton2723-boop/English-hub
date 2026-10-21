@@ -57,7 +57,9 @@ export interface TestResult {
   questionIds?: string[]
 }
 
-export type UnitTheme = 'work' | 'travel' | 'life'
+export type UnitTheme = 'work' | 'kids' | 'travel' | 'life'
+/** Learning categories shown on the courses page; 'core' = grammar units without a theme. */
+export type Category = 'core' | UnitTheme
 
 export interface VocabItem {
   word: string
@@ -70,6 +72,8 @@ export interface Unit {
   level: CefrLevel
   /** Topic badge; core grammar units have none. */
   theme?: UnitTheme
+  /** Kids category only: a unit for children themselves or for parents. */
+  audience?: 'child' | 'parent'
   title: Bilingual
   canDo: Bilingual[]
   vocab: VocabItem[]
