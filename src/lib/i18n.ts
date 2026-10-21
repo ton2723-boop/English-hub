@@ -32,8 +32,8 @@ const STRINGS = {
     en: 'There are 6 levels (A1–C2) with 6 questions each, covering grammar, vocabulary, reading and listening. Questions get harder and the test ends automatically when they become too difficult. Don\'t guess — choose "Not sure" if you don\'t know.',
   },
   postIntroNote: {
-    th: 'ข้อสอบหลังเรียนเป็นชุดคู่ขนาน (คนละข้อกับก่อนเรียน แต่ระดับความยากเท่ากัน)',
-    en: 'The post-test is a parallel form: different questions at the same difficulty as the pre-test.',
+    th: 'ข้อสอบสุ่มจากคลังข้อสอบ ข้อสอบหลังเรียนจะไม่ซ้ำกับข้อที่เคยทำ แต่ระดับความยากเท่ากัน',
+    en: "Questions are drawn from a question bank. The post-test avoids questions you've already seen, at the same difficulty.",
   },
   needsSound: { th: 'ข้อฟังต้องเปิดเสียง', en: 'Listening questions need sound.' },
   begin: { th: 'เริ่มทำข้อสอบ', en: 'Begin' },
@@ -69,6 +69,11 @@ const STRINGS = {
   },
   yourLevelBadge: { th: 'ระดับของคุณ', en: 'Your level' },
   units: { th: 'บท', en: 'units' },
+  unitPassHint: {
+    th: 'ทำได้ 60% ขึ้นไปถือว่าผ่านบทนี้ (ใช้ปลดล็อกข้อสอบหลังเรียน)',
+    en: 'Score 60% or more to pass this unit (needed to unlock the post-test).',
+  },
+  workTheme: { th: 'ภาษาอังกฤษในที่ทำงาน', en: 'Workplace English' },
   goals: { th: 'เป้าหมาย', en: 'Goals' },
   vocabulary: { th: 'คำศัพท์', en: 'Vocabulary' },
   grammar: { th: 'ไวยากรณ์', en: 'Grammar' },
@@ -103,10 +108,11 @@ const STRINGS = {
   progressTitle: { th: 'ความก้าวหน้าของฉัน', en: 'My progress' },
   beforeAfter: { th: 'เปรียบเทียบก่อน–หลังเรียน', en: 'Before vs after' },
   noPre: { th: 'ยังไม่ได้ทำแบบทดสอบก่อนเรียน', en: "You haven't taken the pre-test yet." },
-  noPost: {
-    th: 'เมื่อเรียนจบบทเรียนในระดับของคุณแล้ว ทำแบบทดสอบหลังเรียนเพื่อดูพัฒนาการ',
-    en: 'When you have finished the units at your level, take the post-test to measure your progress.',
+  postLocked: {
+    th: 'ข้อสอบหลังเรียนจะเปิดเมื่อทำแบบฝึกหัดได้อย่างน้อย 60% ในทุกบทของระดับ',
+    en: 'The post-test unlocks when you score at least 60% in every unit of level',
   },
+  postUnlocked: { th: 'ปลดล็อกข้อสอบหลังเรียนแล้ว!', en: 'Post-test unlocked!' },
   takePost: { th: 'ทำแบบทดสอบหลังเรียน', en: 'Take the post-test' },
   improvement: { th: 'พัฒนาการ', en: 'Improvement' },
   points: { th: 'คะแนน', en: 'points' },

@@ -58,5 +58,6 @@ export function scoreTest(kind: TestKind, form: LevelBlock[], answers: Answers, 
     maxScore: byLevel.reduce((n, s) => n + s.total, 0),
     byLevel,
     bySkill,
+    questionIds: Object.keys(answers),
   }
 }

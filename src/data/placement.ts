@@ -1,14 +1,13 @@
 import { q } from '../lib/question'
-import type { LevelBlock, TestKind } from '../types'
-
-const LISTEN = 'Listen and choose the correct answer.'
+import type { CefrLevel, LevelBlock, Question } from '../types'
+import { CEFR_LEVELS } from '../types'
 
 /**
- * Two parallel forms of the placement test with the same structure
- * (6 questions per CEFR level). Form A is the pre-test, Form B the post-test,
- * so learners don't simply remember answers from the first attempt.
+ * Question bank for the placement test: 18 questions per CEFR level
+ * (12 grammar/vocabulary, 3 reading, 3 listening), split into three
+ * authoring sets. Each attempt draws 6 per level — see drawForm().
  */
-const FORM_A: LevelBlock[] = [
+const SET_A: LevelBlock[] = [
   {
     level: 'A1',
     questions: [
@@ -214,7 +213,7 @@ const FORM_A: LevelBlock[] = [
   },
 ]
 
-const FORM_B: LevelBlock[] = [
+const SET_B: LevelBlock[] = [
   {
     level: 'A1',
     questions: [
@@ -409,8 +408,212 @@ const FORM_B: LevelBlock[] = [
   },
 ]
 
-export const LISTEN_INSTRUCTION = LISTEN
 
-export function placementForm(kind: TestKind): LevelBlock[] {
-  return kind === 'pre' ? FORM_A : FORM_B
+const SET_C: LevelBlock[] = [
+  {
+    level: 'A1',
+    questions: [
+      q('c-a1-1', 'grammar', '___ you like tea?', ['Do', 'Does', 'Are', 'Is']),
+      q('c-a1-2', 'grammar', 'This is ___ umbrella.', ['an', 'a', 'the a', 'some']),
+      q('c-a1-3', 'vocabulary', 'Monday, Tuesday, ___ …', ['Wednesday', 'Thursday', 'Sunday', 'Friday']),
+      q('c-a1-4', 'vocabulary', 'You use a ___ to write.', ['pen', 'cup', 'bed', 'door']),
+      q('c-a1-5', 'reading', 'How much is a coffee?', ['50 baht', '8 baht', '80 baht', '15 baht'], {
+        passage: 'The café is next to the bank. It opens at 8 a.m. A coffee is 50 baht.',
+      }),
+      q('c-a1-6', 'listening', 'Where is the toilet?', ['on the second floor', 'on the first floor', 'next to the stairs', 'outside'], {
+        audio: "Excuse me, where is the toilet? — It's on the second floor, next to the lift.",
+      }),
+    ],
+  },
+  {
+    level: 'A2',
+    questions: [
+      q('c-a2-1', 'grammar', 'I ___ TV when the phone rang.', ['was watching', 'watched', 'am watching', 'watch']),
+      q('c-a2-2', 'grammar', "You ___ wear a uniform at work. It's a rule.", ['have to', 'can', "don't have to", 'might']),
+      q('c-a2-3', 'vocabulary', "I'm ___ because I didn't sleep last night.", ['tired', 'bored', 'angry', 'hungry']),
+      q('c-a2-4', 'vocabulary', 'Please ___ off your phone during the film.', ['turn', 'take', 'make', 'put']),
+      q('c-a2-5', 'reading', 'Which sentence is true?', [
+        'The shoe sale ends after this weekend.',
+        'Bags are 30% off.',
+        'The bag sale is this weekend only.',
+        'Shoes are 20% off.',
+      ], {
+        passage: 'SALE! All shoes 30% off this weekend only. Bags 20% off until the end of the month.',
+      }),
+      q('c-a2-6', 'listening', 'How many people is the table for?', ['four', 'seven', 'three', 'two'], {
+        audio: 'Can I book a table for four people at seven thirty on Friday, please?',
+      }),
+    ],
+  },
+  {
+    level: 'B1',
+    questions: [
+      q('c-b1-1', 'grammar', 'She asked me where I ___.', ['lived', 'do live', 'live did', 'did live']),
+      q('c-b1-2', 'grammar', "You ___ smoke here; it's forbidden.", ["mustn't", "don't have to", "needn't", 'could']),
+      q('c-b1-3', 'vocabulary', 'Our flight was ___ because of the storm.', ['cancelled', 'missed', 'lost', 'refused']),
+      q('c-b1-4', 'vocabulary', "He's very ___; he always arrives on time.", ['punctual', 'patient', 'polite', 'popular']),
+      q('c-b1-5', 'reading', 'What does the shop want the customer to do?', [
+        'Choose between waiting and a refund.',
+        'Pay more money.',
+        'Order a different colour.',
+        'Return the jacket.',
+      ], {
+        passage:
+          'Dear customer, thank you for your order. Unfortunately, the blue jacket you ordered is out of stock. We can send it in two weeks or give you a full refund. Please reply to let us know.',
+      }),
+      q('c-b1-6', 'listening', 'Where should the listener park?', [
+        'behind the building',
+        'in front of the building',
+        'in the visitor car park',
+        'on the street',
+      ], {
+        audio:
+          "If you're coming by car, it's best to park behind the building, because the front car park is reserved for visitors.",
+      }),
+    ],
+  },
+  {
+    level: 'B2',
+    questions: [
+      q('c-b2-1', 'grammar', 'The building, ___ was designed in 1920, is now a museum.', ['which', 'that', 'who', 'where']),
+      q('c-b2-2', 'grammar', "You'd better ___ now or you'll miss the train.", ['leave', 'to leave', 'leaving', 'left']),
+      q('c-b2-3', 'vocabulary', 'The new manager quickly ___ the trust of her team.', ['gained', 'raised', 'made', 'took']),
+      q('c-b2-4', 'vocabulary', "The figures don't ___ up — there must be a mistake.", ['add', 'sum', 'count', 'make']),
+      q('c-b2-5', 'reading', 'What did the study find?', [
+        'Short breaks improved productivity.',
+        'Working without breaks is best.',
+        'Most people believe breaks are useful.',
+        'Long breaks work better than short ones.',
+      ], {
+        passage:
+          'Contrary to popular belief, the study found that employees who took regular short breaks were more productive than those who worked continuously for long periods.',
+      }),
+      q('c-b2-6', 'listening', "Why hasn't the report been finished?", [
+        'The system crashed.',
+        'The speaker was ill.',
+        'The deadline changed.',
+        'The speaker forgot.',
+      ], {
+        audio: "I'd have finished the report by now if the system hadn't crashed twice this morning.",
+      }),
+    ],
+  },
+  {
+    level: 'C1',
+    questions: [
+      q('c-c1-1', 'grammar', '___ the weather, the event went ahead as planned.', ['Despite', 'Although', 'However', 'Even though']),
+      q('c-c1-2', 'grammar', "She must ___ the email; otherwise she'd have replied.", [
+        'not have received',
+        'not receive',
+        'have not receiving',
+        'not to have received',
+      ]),
+      q('c-c1-3', 'vocabulary', "The CEO's resignation ___ a wave of speculation.", ['sparked', 'sparkled', 'ignited up', 'struck']),
+      q('c-c1-4', 'vocabulary', 'We need to ___ the pros and cons before deciding.', ['weigh up', 'weigh down', 'pull up', 'carry out']),
+      q('c-c1-5', 'reading', 'What does the writer imply?', [
+        'Personal reasons influenced the decision.',
+        'The move was purely about cost.',
+        'The founder opposed the move.',
+        'Costs rose after the move.',
+      ], {
+        passage:
+          "The company's decision to relocate, though framed as a cost-saving measure, appears to have been driven at least as much by the founder's personal preference for the coastal city.",
+      }),
+      q('c-c1-6', 'listening', 'What does the speaker think?', [
+        'Good parts of the scheme would be lost.',
+        'The scheme should be scrapped.',
+        'The other person is completely right.',
+        'The scheme is too expensive.',
+      ], {
+        audio:
+          "I take your point, but I think we're in danger of throwing the baby out with the bathwater if we scrap the whole scheme.",
+      }),
+    ],
+  },
+  {
+    level: 'C2',
+    questions: [
+      q('c-c2-1', 'grammar', 'So ___ the response that the organisers had to add extra dates.', [
+        'overwhelming was',
+        'was overwhelming',
+        'overwhelming it was',
+        'it was overwhelming',
+      ]),
+      q('c-c2-2', 'grammar', 'Were the proposal ___, it would transform the industry.', [
+        'to be adopted',
+        'adopted being',
+        'adopting',
+        'to adopt',
+      ]),
+      q('c-c2-3', 'vocabulary', "The minister's statement did little to ___ public fears.", ['allay', 'alloy', 'allure', 'allege']),
+      q('c-c2-4', 'vocabulary', 'His account of events was ___ with inconsistencies.', ['riddled', 'rid', 'riddance', 'ridded']),
+      q('c-c2-5', 'reading', 'What criticism does the writer make?', [
+        'The success measures may be biased.',
+        'The report is too long.',
+        'The programme was cancelled.',
+        'The metrics were set independently.',
+      ], {
+        passage:
+          'What the report conspicuously omits is any acknowledgement that the very metrics used to declare the programme a success were devised by those running it.',
+      }),
+      q('c-c2-6', 'listening', 'What is the speaker really doing?', [
+        'Criticising indirectly.',
+        'Praising the department.',
+        'Refusing to give advice.',
+        'Asking for a bigger budget.',
+      ], {
+        audio:
+          'Far be it from me to tell you how to run your department, but you might want to have a word with whoever approved this budget.',
+      }),
+    ],
+  },
+]
+
+/** All questions per level, from every authoring set. */
+export const POOLS: Record<CefrLevel, Question[]> = Object.fromEntries(
+  CEFR_LEVELS.map((level) => [
+    level,
+    [SET_A, SET_B, SET_C].flatMap((set) => set.find((b) => b.level === level)!.questions),
+  ]),
+) as Record<CefrLevel, Question[]>
+
+/** Questions drawn per level in one attempt, by kind. */
+const BLUEPRINT: { kind: 'language' | 'reading' | 'listening'; count: number }[] = [
+  { kind: 'language', count: 4 },
+  { kind: 'reading', count: 1 },
+  { kind: 'listening', count: 1 },
+]
+
+function kindOf(qn: Question): 'language' | 'reading' | 'listening' {
+  return qn.skill === 'grammar' || qn.skill === 'vocabulary' ? 'language' : qn.skill
+}
+
+function shuffled<T>(items: T[], rng: () => number): T[] {
+  const out = [...items]
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1))
+    ;[out[i], out[j]] = [out[j], out[i]]
+  }
+  return out
+}
+
+/**
+ * Draws a fresh test form: 6 questions per level following BLUEPRINT.
+ * Questions in `seen` (from earlier attempts) are avoided while unseen ones
+ * remain, so the post-test never repeats pre-test questions.
+ */
+export function drawForm(seen: Iterable<string> = [], rng: () => number = Math.random): LevelBlock[] {
+  const seenSet = new Set(seen)
+  return CEFR_LEVELS.map((level) => {
+    const questions = BLUEPRINT.flatMap(({ kind, count }) => {
+      const candidates = shuffled(
+        POOLS[level].filter((qn) => kindOf(qn) === kind),
+        rng,
+      )
+      const fresh = candidates.filter((qn) => !seenSet.has(qn.id))
+      const reused = candidates.filter((qn) => seenSet.has(qn.id))
+      return [...fresh, ...reused].slice(0, count)
+    })
+    return { level, questions: shuffled(questions, rng) }
+  })
 }

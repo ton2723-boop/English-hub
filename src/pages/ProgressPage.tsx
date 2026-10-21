@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { UNITS } from '../data/courses'
 import { EXAM_SECTIONS } from '../data/exams'
 import { useT } from '../lib/i18n'
+import { postTestGate } from '../lib/level'
 import { useStore } from '../lib/store'
 import { CEFR_LEVELS, type PlacementLevel, type Skill, type TestResult } from '../types'
 
@@ -11,6 +12,7 @@ export function ProgressPage() {
   const { t, lang } = useT()
   const { tests, practice, reset } = useStore()
   const { pre, post } = tests
+  const gate = postTestGate(tests, practice)
 
   const unitsDone = UNITS.filter((u) => practice[u.id] !== undefined).length
   const examsDone = EXAM_SECTIONS.filter((s) => practice[s.id] !== undefined).length
@@ -38,8 +40,19 @@ export function ProgressPage() {
                 <ResultTile label={t('postTest')} result={post} date={fmt(post.date)} />
               ) : (
                 <div className="tile empty">
-                  <p className="muted">{t('noPost')}</p>
-                  <Link to="/test/post" className="btn">
+                  {gate.unlocked ? (
+                    <p>🔓 {t('postUnlocked')}</p>
+                  ) : (
+                    <>
+                      <p className="muted">
+                        🔒 {t('postLocked')} {gate.level}
+                      </p>
+                      <p className="big-score">
+                        {gate.units.filter((u) => u.passed).length} / {gate.units.length}
+                      </p>
+                    </>
+                  )}
+                  <Link to="/test/post" className={gate.unlocked ? 'btn' : 'btn btn-secondary'}>
                     {t('takePost')}
                   </Link>
                 </div>

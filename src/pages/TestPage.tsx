@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { QuestionView } from '../components/QuestionView'
-import { placementForm } from '../data/placement'
+import { drawForm } from '../data/placement'
 import { useT } from '../lib/i18n'
 import { scoreTest, shouldStopAfter, type Answers } from '../lib/scoring'
 import { useStore } from '../lib/store'
-import type { TestKind } from '../types'
+import { postTestGate } from '../lib/level'
+import type { LevelBlock, TestKind } from '../types'
 
 /** "Not sure" is stored as -1 so it counts as seen-but-wrong. */
 const NOT_SURE = -1
@@ -17,12 +18,11 @@ export function TestPage() {
 }
 
 function PlacementTest({ kind }: { kind: TestKind }) {
-  const { t } = useT()
-  const { tests, saveTest } = useStore()
+  const { t, tr } = useT()
+  const { tests, practice, saveTest } = useStore()
   const navigate = useNavigate()
-  const form = useMemo(() => placementForm(kind), [kind])
 
-  const [started, setStarted] = useState(false)
+  const [form, setForm] = useState<LevelBlock[]>()
   const [blockIdx, setBlockIdx] = useState(0)
   const [qIdx, setQIdx] = useState(0)
   const [selected, setSelected] = useState<number>()
@@ -30,8 +30,16 @@ function PlacementTest({ kind }: { kind: TestKind }) {
 
   const title = kind === 'pre' ? t('preTest') : t('postTest')
   const previous = tests[kind]
+  const gate = postTestGate(tests, practice)
+  const locked = kind === 'post' && !gate.unlocked
 
-  if (!started) {
+  function start() {
+    // Avoid questions from earlier attempts so the post-test is a fresh form.
+    const seen = [...(tests.pre?.questionIds ?? []), ...(tests.post?.questionIds ?? [])]
+    setForm(drawForm(seen))
+  }
+
+  if (!form) {
     return (
       <section className="narrow">
         <h1>{title}</h1>
@@ -43,8 +51,23 @@ function PlacementTest({ kind }: { kind: TestKind }) {
             {t('noPre')} <Link to="/test/pre">{t('preTest')} →</Link>
           </p>
         )}
+        {locked && gate.level && (
+          <div className="notice">
+            <p>
+              🔒 {t('postLocked')} {gate.level}
+            </p>
+            <ul className="gate-list">
+              {gate.units.map(({ unit, best, passed }) => (
+                <li key={unit.id} className={passed ? 'passed' : ''}>
+                  {passed ? '✅' : '⬜'} <Link to={`/unit/${unit.id}`}>{tr(unit.title)}</Link>
+                  <span className="muted small"> {best === undefined ? '—' : `${Math.round(best * 100)}%`}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="actions">
-          <button type="button" className="btn btn-lg" onClick={() => setStarted(true)}>
+          <button type="button" className="btn btn-lg" onClick={start} disabled={locked}>
             {previous ? t('retake') : t('begin')}
           </button>
           {previous && (
@@ -62,6 +85,8 @@ function PlacementTest({ kind }: { kind: TestKind }) {
   const answeredCount = form.slice(0, blockIdx).reduce((n, b) => n + b.questions.length, 0) + qIdx
   const totalCount = form.reduce((n, b) => n + b.questions.length, 0)
 
+  const activeForm = form
+
   function submit(choice: number) {
     const next = { ...answers, [question.id]: choice }
     setAnswers(next)
@@ -71,9 +96,9 @@ function PlacementTest({ kind }: { kind: TestKind }) {
       setQIdx(qIdx + 1)
       return
     }
-    const finished = blockIdx + 1 >= form.length || shouldStopAfter(block, next)
+    const finished = blockIdx + 1 >= activeForm.length || shouldStopAfter(block, next)
     if (finished) {
-      saveTest(scoreTest(kind, form, next))
+      saveTest(scoreTest(kind, activeForm, next))
       navigate(`/result/${kind}`)
       return
     }

@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { unitsForLevel } from '../data/courses'
 import { LEVEL_INFO } from '../data/levels'
 import { useT } from '../lib/i18n'
-import { currentLevel, studyLevel } from '../lib/level'
+import { currentLevel, studyLevel, UNIT_PASS } from '../lib/level'
 import { useStore } from '../lib/store'
 import { CEFR_LEVELS } from '../types'
 
@@ -38,9 +38,12 @@ export function CoursesPage() {
                 const best = practice[u.id]
                 return (
                   <Link key={u.id} to={`/unit/${u.id}`} className="card unit-card">
+                    {u.theme === 'work' && <span className="tag tag-work">💼 {t('workTheme')}</span>}
                     <h3>{tr(u.title)}</h3>
                     <p className="muted small">{u.grammar.title}</p>
-                    {best !== undefined && <span className="score-chip">✓ {Math.round(best * 100)}%</span>}
+                    {best !== undefined && (
+                      <span className={`score-chip ${best >= UNIT_PASS ? '' : 'low'}`}>{Math.round(best * 100)}%</span>
+                    )}
                   </Link>
                 )
               })}

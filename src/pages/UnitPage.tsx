@@ -22,6 +22,7 @@ export function UnitPage() {
       <div className="level-head">
         <span className="level-pill">{unit.level}</span>
         <h1>{tr(unit.title)}</h1>
+        {unit.theme === 'work' && <span className="tag tag-work">💼 {t('workTheme')}</span>}
       </div>
 
       <section className="card">
@@ -77,6 +78,7 @@ export function UnitPage() {
       )}
 
       <h2>🧩 {t('practice')}</h2>
+      <p className="muted small">{t('unitPassHint')}</p>
       <PracticeQuiz key={unit.id} questions={unit.practice} best={practice[unit.id]} onFinish={(f) => savePractice(unit.id, f)} />
     </article>
   )

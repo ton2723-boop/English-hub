@@ -635,6 +635,33 @@ a.card:hover {
   border-radius: 999px;
 }
 
+.score-chip.low {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+.tag-work {
+  background: var(--primary-soft);
+  color: var(--primary);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-bottom: 6px;
+}
+
+.gate-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+}
+
+.gate-list li {
+  margin: 4px 0;
+}
+
+.notice p {
+  margin: 0;
+}
+
 .checklist {
   padding-left: 0;
   list-style: none;

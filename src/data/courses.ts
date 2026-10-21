@@ -1,7 +1,8 @@
 import { q } from '../lib/question'
-import type { CefrLevel, Unit } from '../types'
+import { CEFR_LEVELS, type CefrLevel, type Unit } from '../types'
+import { WORK_UNITS } from './courses-work'
 
-export const UNITS: Unit[] = [
+const CORE_UNITS: Unit[] = [
   // ───────────── A1 ─────────────
   {
     id: 'a1-1',
@@ -553,6 +554,11 @@ export const UNITS: Unit[] = [
     ],
   },
 ]
+
+/** Core units then workplace units, ordered by level. */
+export const UNITS: Unit[] = CEFR_LEVELS.flatMap((level) =>
+  [...CORE_UNITS, ...WORK_UNITS].filter((u) => u.level === level),
+)
 
 export function unitsForLevel(level: CefrLevel): Unit[] {
   return UNITS.filter((u) => u.level === level)

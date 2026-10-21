@@ -53,6 +53,8 @@ export interface TestResult {
   maxScore: number
   byLevel: LevelScore[]
   bySkill: Record<Skill, { correct: number; total: number }>
+  /** Questions the learner saw, so later attempts can avoid repeating them. */
+  questionIds?: string[]
 }
 
 export interface VocabItem {
@@ -64,6 +66,8 @@ export interface VocabItem {
 export interface Unit {
   id: string
   level: CefrLevel
+  /** 'work' marks workplace-English units. */
+  theme?: 'work'
   title: Bilingual
   canDo: Bilingual[]
   vocab: VocabItem[]
