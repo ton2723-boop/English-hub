@@ -3,6 +3,7 @@ import { postTestGate } from '../lib/level'
 import { CEFR_LEVELS, type TestResult } from '../types'
 import { UNITS, unitsForLevel } from './courses'
 import { EXAM_SECTIONS } from './exams'
+import { TOEIC_EXTRA_PRACTICE, TOEIC_EXTRA_TIPS } from './exams-toeic'
 
 describe('course data', () => {
   it('covers every level in every adult category', () => {
@@ -47,9 +48,27 @@ describe('course data', () => {
 })
 
 describe('exam sections', () => {
-  it('lists 13 sections, each in the display order', () => {
-    expect(EXAM_SECTIONS).toHaveLength(13)
+  it('lists 16 sections, each in the display order', () => {
+    expect(EXAM_SECTIONS).toHaveLength(16)
     expect(EXAM_SECTIONS.map((s) => s.exam).lastIndexOf('IELTS')).toBeLessThan(EXAM_SECTIONS.map((s) => s.exam).indexOf('TOEIC'))
+  })
+})
+
+describe('TOEIC practice', () => {
+  it('attaches every extra set to an existing section', () => {
+    const ids = new Set(EXAM_SECTIONS.map((s) => s.id))
+    for (const id of [...Object.keys(TOEIC_EXTRA_PRACTICE), ...Object.keys(TOEIC_EXTRA_TIPS)]) expect(ids.has(id), id).toBe(true)
+  })
+
+  it('covers all seven parts with at least 8 questions each, listening items with audio', () => {
+    for (let part = 1; part <= 7; part++) {
+      const s = EXAM_SECTIONS.find((x) => x.id === `toeic-part${part}`)
+      expect(s, `part ${part}`).toBeDefined()
+      expect(s!.practice.length, s!.id).toBeGreaterThanOrEqual(8)
+    }
+    for (const qn of EXAM_SECTIONS.filter((s) => s.exam === 'TOEIC').flatMap((s) => s.practice)) {
+      if (qn.skill === 'listening') expect(qn.audio, qn.id).toBeTruthy()
+    }
   })
 })
 
