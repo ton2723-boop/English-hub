@@ -467,6 +467,54 @@ a.card:hover {
   margin: 12px 0;
 }
 
+.read-aloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 4px;
+}
+
+.read-prefs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.read-aloud .btn-sm {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+
+.read-prefs .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.read-prefs .chip:has(input:checked) {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.read-prefs .chip input {
+  accent-color: var(--primary);
+  margin: 0;
+}
+
+.prompt.hidden-text {
+  font-weight: 400;
+}
+
 .audio .passage {
   flex-basis: 100%;
 }

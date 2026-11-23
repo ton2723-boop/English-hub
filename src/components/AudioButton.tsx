@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useT } from '../lib/i18n'
+import { rateFor, useReadAloudPrefs } from '../lib/readAloud'
 import { speak, speechSupported, stopSpeaking } from '../lib/speech'
 
 export function AudioButton({ text, allowTranscript = false }: { text: string; allowTranscript?: boolean }) {
   const { t } = useT()
+  const prefs = useReadAloudPrefs()
   const [playing, setPlaying] = useState(false)
   const [showText, setShowText] = useState(false)
 
@@ -24,7 +26,7 @@ export function AudioButton({ text, allowTranscript = false }: { text: string; a
 
   async function play() {
     setPlaying(true)
-    await speak(text)
+    await speak(text, rateFor(prefs))
     setPlaying(false)
   }
 
