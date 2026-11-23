@@ -1,6 +1,7 @@
 import { q } from '../lib/question'
 import type { ExamSection } from '../types'
 import { MORE_EXAM_SECTIONS } from './exams-more'
+import { TOEIC_EXTRA_PRACTICE, TOEIC_EXTRA_TIPS, TOEIC_NEW_SECTIONS } from './exams-toeic'
 
 const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN']
 
@@ -256,17 +257,24 @@ const ORDER = [
   'ielts-writing-task1',
   'ielts-writing',
   'ielts-speaking',
+  'toeic-part1',
   'toeic-part2',
   'toeic-part3',
   'toeic-part4',
   'toeic-part5',
   'toeic-part6',
   'toeic-part7',
+  'toeic-vocab',
+  'toeic-mock',
 ]
 
-export const EXAM_SECTIONS: ExamSection[] = [...BASE_EXAM_SECTIONS, ...MORE_EXAM_SECTIONS].sort(
-  (a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id),
-)
+export const EXAM_SECTIONS: ExamSection[] = [...BASE_EXAM_SECTIONS, ...MORE_EXAM_SECTIONS, ...TOEIC_NEW_SECTIONS]
+  .map((s) => ({
+    ...s,
+    tips: [...s.tips, ...(TOEIC_EXTRA_TIPS[s.id] ?? [])],
+    practice: [...s.practice, ...(TOEIC_EXTRA_PRACTICE[s.id] ?? [])],
+  }))
+  .sort((a, b) => ORDER.indexOf(a.id) - ORDER.indexOf(b.id))
 
 export function findExamSection(id: string): ExamSection | undefined {
   return EXAM_SECTIONS.find((s) => s.id === id)
